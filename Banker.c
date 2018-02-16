@@ -63,7 +63,10 @@ void initBank(int *resources, int m, int n) {
 	numberOfResources = m;
 
 	// initialize the available vector
-	*available = *resources;
+	for (int i = 0; i < numberOfResources; ++i)
+	{
+		available[i] = resources[i];
+	}
 }
 
 /**
@@ -82,7 +85,7 @@ void freeBank() {
 void printState() {
 	int i, j;
 	// print the current state with a tidy format
-	printf("%s\n", "Current state:");
+	printf("\n%s\n", "Current state:");
 
 	// print available
 	printf("%s\n", "Available:");
@@ -90,7 +93,7 @@ void printState() {
 	{
 		printf("%d ", available[i]);
 	}
-	printf("\n");
+	printf("\n\n");
 
 	// print maximum
 	printf("%s\n", "Maximum:");
@@ -98,7 +101,7 @@ void printState() {
 	{
 		for (j = 0; j < numberOfResources; ++j)
 		{
-			printf("%d ", maximum[j]);
+			printf("%d ", maximum[i][j]);
 		}
 		printf("\n");
 	}
@@ -110,7 +113,7 @@ void printState() {
 	{
 		for (j = 0; j < numberOfResources; ++j)
 		{
-			printf("%d ", allocation[j]);
+			printf("%d ", allocation[i][j]);
 		}
 		printf("\n");
 	}
@@ -122,7 +125,7 @@ void printState() {
 	{
 		for (j = 0; j < numberOfResources; ++j)
 		{
-			printf("%d ", need[j]);
+			printf("%d ", need[i][j]);
 		}
 		printf("\n");
 	}
@@ -136,8 +139,11 @@ void printState() {
  */
 void setMaximumDemand(int customerIndex, int *maximumDemand) {
 	// add customer, update maximum and need
-	maximum[customerIndex] = *maximumDemand;
-	need[customerIndex] = *maximumDemand;
+	for (int i = 0; i < numberOfResources; ++i)
+	{
+		maximum[customerIndex][i] = maximumDemand[i];
+		need[customerIndex][i] = maximumDemand[i];	
+	}
 }
 
 /**
@@ -175,12 +181,13 @@ int requestResources(int customerIndex, int *request) {
 	{
 		printf("%d ", request[i]);
 	}
+	printf("\n");
 	
 	// checks if we can allocate
 	for (i = 0; i < numberOfResources; ++i)
 	{
 		// judge if request larger than need
-		if (request[i] > need[i])
+		if (request[i] > need[customerIndex][i])
 		{
 			return 0;
 		}
@@ -212,12 +219,14 @@ int requestResources(int customerIndex, int *request) {
  * @param release        An array of the release count for each resource.
  */
 void releaseResources(int customerIndex, int *release) {
+	int i;
 	// print the release
 	printf("Customer %d releasing\n", customerIndex);
 	for (i = 0; i < numberOfResources; ++i)
 	{
 		printf("%d ", release[i]);
 	}
+	printf("\n");
 
 	// deal with release (:For simplicity, we do not judge the release request, just update directly)
 	for (i = 0; i < numberOfResources; ++i)
