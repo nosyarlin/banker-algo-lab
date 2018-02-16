@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 int numberOfCustomers; // the number of customers
 int numberOfResources; // the number of resources
@@ -154,15 +155,74 @@ void setMaximumDemand(int customerIndex, int *maximumDemand) {
  *         safe state, else 0
  */
 int checkSafe(int customerIndex, int *request) {
+	// Allocate local variables
+	int *finish = mallocIntVector(numberOfCustomers);
+	int possible = 1;
+	int allPossible;
+	int i, j;
+
 	// Allocate temporary memory to copy the bank state.
 	int *work = mallocIntVector(numberOfResources);
 	int **tempNeed = mallocIntMatrix(numberOfCustomers, numberOfResources);
 	int **tempAllocation = mallocIntMatrix(numberOfCustomers, numberOfResources);
 	
-	// TODO: copy the bank's state to the temporary memory and update it with the request.
-	
-	// TODO: check if the new state is safe
+	// copy the bank's state to the temporary memory and update it with the request.
+	for (i = 0; i < numberOfCustomers; ++i)
+	{
+		for (j = 0; j < numberOfResources; ++j)
+		{
+			tempNeed[i][j] = need[i][j];
+			tempAllocation[i][j] = allocation[i][j];
+		}
+	}
 
+	for (i = 0; i < numberOfResources; ++i)
+	{
+		work[i] = available[i]-request[i];
+		tempNeed[customerIndex][i] = tempNeed[customerIndex][i] - request[i];
+		tempAllocation[customerIndex][i] = tempAllocation[customerIndex][i] + request[i];
+	}
+
+	// check if the new state is safe
+	while(possible){
+		possible = 0;
+		for (i = 0; i < numberOfCustomers; ++i)
+		{
+			if (finish[i] != 1)
+			{
+				// Check if all need is within available
+				allPossible = 1;
+				for (j = 0; j < numberOfResources; ++j)
+				{
+					if (tempNeed[i][j] > work[j])
+					{
+						allPossible = 0;
+					}
+				}
+				// Since need can be fulfilled, we assume it can finish
+				if (allPossible == 1)
+				{
+					possible = 1;
+					for (j = 0; j < numberOfResources; ++j)
+					{
+						work[j] = work[j] + tempAllocation[i][j];
+					}
+					finish[i] = 1;
+				}
+			}
+		}
+	}
+
+	// If any customer can't finish, return false
+	for (i = 0; i < numberOfCustomers; ++i)
+	{
+		if (finish[i] != 1)
+		{
+			return 0;
+		}
+	}
+
+	// else return true
 	return 1;
 }
 
