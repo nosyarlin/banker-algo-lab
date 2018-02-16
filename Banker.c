@@ -15,6 +15,7 @@ int *available;       // the available amount of each resource
 int **maximum;        // the maximum demand of each customer
 int **allocation;     // the amount currently allocated
 int **need;           // the remaining needs of each customer
+int *finish; 		  // will be used to testing whether all customers can finish
 
 // Utility function to allocate an int vector.
 int *mallocIntVector(int size) {
@@ -75,6 +76,7 @@ void initBank(int *resources, int m, int n) {
  */
 void freeBank() {
 	freeIntVector(available);
+	freeIntVector(finish);
 	freeIntMatrix(need);
 	freeIntMatrix(allocation);
 	free(maximum);
@@ -156,10 +158,10 @@ void setMaximumDemand(int customerIndex, int *maximumDemand) {
  */
 int checkSafe(int customerIndex, int *request) {
 	// Allocate local variables
-	int *finish = mallocIntVector(numberOfCustomers);
 	int possible = 1;
 	int allPossible;
 	int i, j;
+	finish = mallocIntVector(numberOfCustomers);
 
 	// Allocate temporary memory to copy the bank state.
 	int *work = mallocIntVector(numberOfResources);
