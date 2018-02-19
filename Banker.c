@@ -214,6 +214,10 @@ int checkSafe(int customerIndex, int *request) {
 			}
 		}
 	}
+	// free memory allocation
+	freeIntVector(work);
+	freeIntMatrix(tempNeed);
+	freeIntMatrix(tempAllocation);
 
 	// If any customer can't finish, return false
 	for (i = 0; i < numberOfCustomers; ++i)
